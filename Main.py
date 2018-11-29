@@ -2,6 +2,8 @@ import pygame
 import sys
 from Constants import *
 
+from Objects import *
+
 
 class Game():
 
@@ -11,13 +13,23 @@ class Game():
 
         self.width = SCREEN_WIDTH
         self.height = SCREEN_HEIGHT
-        
+
+        self.objects = [Hero(self.screen)]
+
         self.loop()
 
     def loop(self):
+        last_time = 0
         while self.running:
+
+            current_time = pygame.time.get_ticks()
+            dt = current_time - last_time
+            last_time = current_time
+
             self.handle_events()
-            self.render()
+    
+            if self.running:
+                self.render(dt)
 
 
     def handle_events(self):
@@ -34,12 +46,15 @@ class Game():
 
                 screen = pygame.display.set_mode((self.width, self.height), pygame.RESIZABLE)
 
+            elif event.type == pygame.KEYDOWN or event.type == pygame.KEYUP:
+                for i in self.objects:
+                    i.handle_event(event.type, event.key)
 
-
-    def render(self):
+    def render(self, dt):
         self.screen.fill((200, 200, 200))
 
-        self.screen.blit(IMG, (self.width - 600, self.height - 600))
+        for i in self.objects:
+            i.render(dt)
 
         pygame.display.update()
         
