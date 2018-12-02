@@ -5,8 +5,8 @@ from Constants import *
 from Blocks import *
 from Objects import *
 
-FULLSCREEN_WIDTH = ctypes.windll.user32.GetSystemMetrics(0)
-FULLSCREEN_HEIGHT = ctypes.windll.user32.GetSystemMetrics(1)
+#FULLSCREEN_WIDTH = ctypes.windll.user32.GetSystemMetrics(0)
+#FULLSCREEN_HEIGHT = ctypes.windll.user32.GetSystemMetrics(1)
 
 class Game():
 
