@@ -1,9 +1,12 @@
 import pygame
 import sys
+import ctypes
 from Constants import *
-
+from Blocks import *
 from Objects import *
 
+FULLSCREEN_WIDTH = ctypes.windll.user32.GetSystemMetrics(0)
+FULLSCREEN_HEIGHT = ctypes.windll.user32.GetSystemMetrics(1)
 
 class Game():
 
@@ -14,7 +17,8 @@ class Game():
         self.width = SCREEN_WIDTH
         self.height = SCREEN_HEIGHT
 
-        self.objects = [Hero(self.screen)]
+        self.blocks = self.initialize_level(LEVEL)
+        self.player = Hero(self.screen)
 
         self.loop()
 
@@ -30,6 +34,9 @@ class Game():
     
             if self.running:
                 self.render(dt)
+
+            for i in self.blocks:
+                self.player.check_collision(i)
 
 
     def handle_events(self):
@@ -47,17 +54,37 @@ class Game():
                 screen = pygame.display.set_mode((self.width, self.height), pygame.RESIZABLE)
 
             elif event.type == pygame.KEYDOWN or event.type == pygame.KEYUP:
-                for i in self.objects:
-                    i.handle_event(event.type, event.key)
+                    self.player.handle_event(event.type, event.key)
 
     def render(self, dt):
         self.screen.fill((200, 200, 200))
 
-        for i in self.objects:
-            i.render(dt)
+        for i in self.blocks:
+            i.render()
+
+        self.player.render(dt)
 
         pygame.display.update()
+
         
+    def initialize_level(self, level):
+        blocks = list()
+        y = self.height - BLOCK_HEIGHT
+
+        for string in reversed(level):
+            x = 0
+            for symbol in string:
+                if symbol == "1":
+                    blocks.append(Grass_block(self.screen, x, y))
+                elif symbol == "2":
+                    blocks.append(Grass(self.screen, x, y))
+                elif symbol == "3":
+                    blocks.append(Dirt_block(self.screen, x, y))
+                x += BLOCK_WIDTH
+            y -= BLOCK_HEIGHT
+
+        return blocks
+
 
 
 pygame.init()
