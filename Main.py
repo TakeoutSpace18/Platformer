@@ -18,6 +18,12 @@ class Game():
         self.height = SCREEN_HEIGHT
 
         self.blocks = self.initialize_level(LEVEL)
+        self.platforms = []
+
+        for i in self.blocks:                   #
+            if i.type == FIRM:
+                self.platforms.append(i)
+
         self.player = Hero(self.screen)
 
         self.loop()
@@ -31,12 +37,11 @@ class Game():
             last_time = current_time
 
             self.handle_events()
-    
+            self.player.update(self.platforms, dt)
             if self.running:
                 self.render(dt)
 
-            for i in self.blocks:
-                self.player.check_collision(i)
+            
 
 
     def handle_events(self):
@@ -62,13 +67,14 @@ class Game():
         for i in self.blocks:
             i.render()
 
-        self.player.render(dt)
+        self.player.render()
 
         pygame.display.update()
 
         
     def initialize_level(self, level):
         blocks = list()
+        entities = list()
         y = self.height - BLOCK_HEIGHT
 
         for string in reversed(level):

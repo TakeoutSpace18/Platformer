@@ -10,51 +10,72 @@ class Hero():
         self.x = 50
         self.y = 70
 
+        self.rect = self.img.get_rect()
+        self.rect.topleft = (self.x, self.y)
 
         self.onGround = False
-        self.moving = False
-        self.direction = RIGHT
+
+
+        self.jump_power = 2
+        self.yvel = 0
+        self.xvel = 0
 
         self.speed = 0.3
         self.gravity_force = 0.1
 
     def handle_event(self, event_type, key):
         if event_type == pygame.KEYDOWN:
-            self.moving = True
-            if key == pygame.K_RIGHT:
-                self.direction = RIGHT
-            if key == pygame.K_LEFT:
-                self.direction = LEFT
-        else: 
-            if key == pygame.K_LEFT and self.direction == LEFT:
-                self.moving = False
+            if key == pygame.K_UP:
+                if self.onGround:
+                    self.yvel = -self.jump_power
 
-            if key == pygame.K_RIGHT and self.direction == RIGHT:
-                self.moving = False
+            if key == pygame.K_RIGHT:
+                self.xvel = self.speed
+
+            if key == pygame.K_LEFT:
+                self.xvel = -self.speed
+        else: 
+            if key == pygame.K_LEFT and self.xvel < 0:
+                self.xvel = 0
+
+            if key == pygame.K_RIGHT and self.xvel > 0:
+                self.xvel = 0
 
                 
-    def check_collision(self, blk):
-        player = self.img.get_rect()
-        player.x = self.x
-        player.y = self.y
-        block = blk.img.get_rect()
-        block.x = blk.x
-        block.y = blk.y 
+    def check_collision(self, platforms):
+        for p in platforms:
 
-        if player.colliderect(block):
-            print("collision")
-            if player.right >= block.left and player.left <= block.right and player.bottom >= block.top:
-                self.onGround = True
-                print("onground true")
+            if self.rect.colliderect(p.rect):
 
-    def render(self, dt):
+                if xvel > 0:
+                    self.rect.right = p.rect.left
+
+                if xvel < 0:
+                    self.rect.left = p.rect.right
+
+                if yvel > 0:
+                    self.rect.bottom = p.rect.top
+                    self.onGround = True
+                    self.yvel = 0
+
+                if yvel < 0:
+                    self.rect.top = p.rect.bottom 
+                    self.yvel = 0                 
+
+            
+
+    def update(self, platforms, dt):
+
         if not self.onGround:
-            self.y += self.gravity_force * dt
+            self.yvel +=  self.gravity_force
 
-        if self.moving:
-            if self.direction == RIGHT:
-                self.x += self.speed * dt
-            elif self.direction == LEFT:
-                self.x -= self.speed * dt
+        self.onGround = False
+        self.check_collision(platforms)
+        self.rect.x += self.xvel * dt
+        self.rect.y += self.yvel * dt
 
-        self.screen.blit(self.img, (self.x, self.y))
+
+
+    def render(self):
+
+        self.screen.blit(self.img, self.rect)
