@@ -37,9 +37,11 @@ class Game():
             last_time = current_time
 
             self.handle_events()
+
             self.player.update(self.platforms, dt)
+
             if self.running:
-                self.render(dt)
+                self.render()
 
             
 
@@ -61,7 +63,7 @@ class Game():
             elif event.type == pygame.KEYDOWN or event.type == pygame.KEYUP:
                     self.player.handle_event(event.type, event.key)
 
-    def render(self, dt):
+    def render(self):
         self.screen.fill((200, 200, 200))
 
         for i in self.blocks:
@@ -83,7 +85,8 @@ class Game():
                 if symbol == "1":
                     blocks.append(Grass_block(self.screen, x, y))
                 elif symbol == "2":
-                    blocks.append(Grass(self.screen, x, y))
+                    pass
+                    #blocks.append(Grass(self.screen, x, y))
                 elif symbol == "3":
                     blocks.append(Dirt_block(self.screen, x, y))
                 x += BLOCK_WIDTH

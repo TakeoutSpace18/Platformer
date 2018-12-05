@@ -11,6 +11,11 @@ class Block():
         self.x = x
         self.y = y
 
+        self.top = self.y
+        self.bottom = self.y + BLOCK_HEIGHT
+        self.left = self.x
+        self.right = self.x + BLOCK_WIDTH
+
         self.rect = self.img.get_rect()
         self.rect.topleft = (self.x, self.y)
 
