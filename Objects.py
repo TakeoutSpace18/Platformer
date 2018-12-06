@@ -76,16 +76,17 @@ class Hero():
         for p in platforms:
 
             if between(p.top, self.top, self.bottom) or between(p.bottom, self.top, self.bottom):
-                if p.right < self.left:
+                if p.right <= self.left and p.right > self.left - self.width:
                     self.left_blocks.append(p)
-                elif p.left > self.right:
+                elif p.left >= self.right and p.left < self.right + self.width:
                     self.right_blocks.append(p)
 
             if between(p.left, self.left, self.right) or between(p.right, self.left, self.right):
-                if p.bottom < self.top:
+                if p.bottom <= self.top and p.bottom > self.top - self.height:
                     self.top_blocks.append(p)
-                elif p.top > self.bottom:
+                elif p.top > self.bottom and p.top < self.bottom + self.height:
                     self.bottom_blocks.append(p)
+
 
     def check_collision(self, xvel, yvel, platforms):
 
@@ -94,6 +95,7 @@ class Hero():
 
                 if yvel < 0 and intersects(self, p)[1 == UP]:
                     self.y = p.bottom
+                    self.yvel = 0
 
                 if yvel > 0 and intersects(self, p)[1] == DOWN:
                     self.y = p.top - self.height
