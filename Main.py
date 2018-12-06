@@ -20,11 +20,11 @@ class Game():
         self.blocks = self.initialize_level(LEVEL)
         self.platforms = []
 
-        for i in self.blocks:                   #
+        for i in self.blocks:
             if i.type == FIRM:
                 self.platforms.append(i)
 
-        self.player = Hero(self.screen)
+        self.player = Hero(self.screen, self)
 
         self.loop()
 
@@ -37,7 +37,8 @@ class Game():
             last_time = current_time
 
             self.handle_events()
-
+            for block in self.platforms:
+                block.img = block.default_img
             self.player.update(self.platforms, dt)
 
             if self.running:
@@ -86,7 +87,7 @@ class Game():
                     blocks.append(Grass_block(self.screen, x, y))
                 elif symbol == "2":
                     pass
-                    #blocks.append(Grass(self.screen, x, y))
+                    blocks.append(Grass(self.screen, x, y))
                 elif symbol == "3":
                     blocks.append(Dirt_block(self.screen, x, y))
                 x += BLOCK_WIDTH
