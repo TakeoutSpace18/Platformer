@@ -6,16 +6,16 @@ def between(a, mn, mx):
         return True
     else: return False
 
-def intersects(one, two): #returns (LEFT/RIGHT, UP/DOWN)
+def intersects(one, two):
 
     if one.bottom <= two.bottom and one.bottom > two.top and one.right > two.left and one.right <= two.right:
-        return (RIGHT, DOWN)    
+        return True    
     elif one.bottom <= two.bottom and one.bottom > two.top and one.left >= two.left and one.left < two.right:
-        return (LEFT, DOWN)
+        return True
     elif one.top < two.bottom and one.top >= two.top and one.left >= two.left and one.left < two.right:
-        return (LEFT, UP)
+        return True
     elif one.top < two.bottom and one.top >= two.top and one.right > two.left and one.right <= two.right:
-        return (RIGHT, UP)
+        return True
     else: return False
 
 class Hero():
@@ -25,7 +25,7 @@ class Hero():
         self.game = game
 
         self.img = HERO
-        self.x = 50
+        self.x = 150
         self.y = 70
 
         self.height = self.img.get_height()
@@ -46,9 +46,9 @@ class Hero():
         self.yvel = 0
         self.xvel = 0
 
-        self.jump_power = 0.5
-        self.speed = 0.3
-        self.gravity_force = 0.007
+        self.jump_power = 0.8
+        self.speed = 0.25
+        self.gravity_force = 0.035
 
     def handle_event(self, event_type, key):
         if event_type == pygame.KEYDOWN:
@@ -73,40 +73,61 @@ class Hero():
         self.right_blocks = []
         self.left_blocks = []
 
+
         for p in platforms:
 
             if between(p.top, self.top, self.bottom) or between(p.bottom, self.top, self.bottom):
-                if p.right <= self.left and p.right > self.left - self.width:
+                if p.right <= self.left + 5 and p.right > self.left - self.width // 2:
                     self.left_blocks.append(p)
-                elif p.left >= self.right and p.left < self.right + self.width:
+                elif p.left >= self.right - 5 and p.left < self.right + self.width // 2:
                     self.right_blocks.append(p)
 
+        for p in platforms:
+            denied = False
+
+            for b in self.left_blocks:
+                if b.x == p.x:
+                    denied = True
+                    break
+
+            for b in self.right_blocks:
+                if b.x == p.x:
+                    denied = True
+                    break 
+
             if between(p.left, self.left, self.right) or between(p.right, self.left, self.right):
-                if p.bottom <= self.top and p.bottom > self.top - self.height:
-                    self.top_blocks.append(p)
-                elif p.top > self.bottom and p.top < self.bottom + self.height:
-                    self.bottom_blocks.append(p)
+                if p.bottom <= self.top and p.bottom > self.top - self.height // 3:
+                    if not denied:
+                        self.top_blocks.append(p)
+                elif p.top >= self.bottom and p.top < self.bottom + self.height // 3:
+                    if not denied:
+                        self.bottom_blocks.append(p)
 
 
     def check_collision(self, xvel, yvel, platforms):
 
-        for p in platforms:
-            if intersects(self, p):
+        if self.bottom_blocks == []:
+            self.onGround = False
 
-                if yvel < 0 and intersects(self, p)[1 == UP]:
-                    self.y = p.bottom
-                    self.yvel = 0
+        if self.bottom_blocks != [] and yvel > 0:
+            
+            self.y = self.bottom_blocks[0].top - self.height
+            self.onGround = True
+            self.yvel = 0
 
-                if yvel > 0 and intersects(self, p)[1] == DOWN:
-                    self.y = p.top - self.height
-                    self.onGround = True
-                    self.yvel = 0
-                    
-                if xvel > 0 and intersects(self, p)[0] == RIGHT:
-                    self.x = p.left - self.width
+        if self.top_blocks != [] and yvel < 0:
+            
+            self.y = self.top_blocks[0].bottom
+            self.yvel = 0
 
-                if xvel < 0 and intersects(self, p)[0] == LEFT:
-                    self.x = p.right           
+        if self.right_blocks != [] and xvel > 0:
+            
+            self.x = self.right_blocks[0].left - self.width + 1
+
+        if self.left_blocks != [] and xvel < 0:
+            
+            self.x = self.left_blocks[0].right
+
 
     def update(self, platforms, dt):
 
@@ -122,6 +143,7 @@ class Hero():
         self.left = self.x
         self.right = self.x + self.width - 1
 
+        self.select_blocks(platforms)
         self.check_collision(self.xvel, 0, platforms)
 
         self.y += self.yvel * dt
@@ -131,20 +153,18 @@ class Hero():
 
         self.check_collision(0, self.yvel, platforms)
 
-        self.select_blocks(platforms)
+        if COLOR_BORDER_BLOCKS:
+            for block in self.bottom_blocks:
+                block.img = RED
 
+            for block in self.right_blocks:
+                block.img = RED
 
-        for block in self.bottom_blocks:
-            block.img = RED
+            for block in self.left_blocks:
+                block.img = RED
 
-        for block in self.right_blocks:
-            block.img = RED
-
-        for block in self.left_blocks:
-            block.img = RED
-
-        for block in self.top_blocks:
-            block.img = RED
+            for block in self.top_blocks:
+                block.img = RED
         
 
     def render(self):

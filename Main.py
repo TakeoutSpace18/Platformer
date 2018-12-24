@@ -65,12 +65,11 @@ class Game():
                     self.player.handle_event(event.type, event.key)
 
     def render(self):
-        self.screen.fill((200, 200, 200))
-
-        for i in self.blocks:
-            i.render()
+        self.screen.fill((170, 252, 249))
 
         self.player.render()
+        for i in self.blocks:
+            i.render()
 
         pygame.display.update()
 
