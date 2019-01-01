@@ -18,10 +18,52 @@ def intersects(one, two):
         return True
     else: return False
 
+class Camera():
+    def __init__(self, screen, win_width, win_height):
+        self.width = win_width // SCALE
+        self.height = win_height // SCALE
+        self.x = 0
+        self.y = 0
+        self.screen = screen
+        self.surface = pygame.Surface((self.width, self.height))
+
+        self.top = self.y
+        self.bottom = self.y + self.height - 1
+        self.left = self.x
+        self.right = self.x + self.width - 1
+
+    def update(self, hero_x, hero_y, width, height):
+
+        self.width = width // SCALE
+        self.height = height // SCALE
+
+        self.x = hero_x - self.width / 2
+        self.y = hero_y - self.height / 2
+
+        self.top = self.y
+        self.bottom = self.y + self.height - 1
+        self.left = self.x
+        self.right = self.x + self.width - 1
+
+        if self.bottom > TOTAL_LEVEL_HEIGHT: 
+            self.y = TOTAL_LEVEL_HEIGHT - self.height
+
+        self.surface.fill((170, 252, 249))
+
+    def apply(self, element):
+        if intersects(element, self):
+            x = element.x - self.x
+            y = element.y - self.y
+            self.surface.blit(element.img, (x, y))
+
+    def render(self):
+        srf = pygame.transform.scale(self.surface, (SCREEN_WIDTH, SCREEN_HEIGHT))
+        self.screen.blit(srf, (0, 0))
+
 class Hero():
 
-    def __init__(self, screen, game):
-        self.screen = screen
+    def __init__(self, camera, game):
+        self.camera = camera
         self.game = game
 
         self.img = HERO
@@ -168,4 +210,4 @@ class Hero():
         
 
     def render(self):
-        self.screen.blit(self.img, (self.x, self.y))
+        self.camera.apply(self)

@@ -3,8 +3,8 @@ import pygame
 
 class Block():
 
-    def __init__(self, screen, x, y, image):
-        self.screen = screen
+    def __init__(self, camera, x, y, image):
+        self.camera = camera
         self.img = image
         self.type = FIRM
 
@@ -20,7 +20,7 @@ class Block():
         self.rect.topleft = (self.x, self.y)
 
     def render(self):
-        self.screen.blit(self.img, (self.x, self.y))
+        self.camera.apply(self)
 
 
 class Grass_block(Block):
